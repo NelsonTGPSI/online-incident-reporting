@@ -133,10 +133,15 @@ app.post('/send', (req, res)=>{
 
 
 
+// Rota básica para o Render confirmar que o servidor está ativo
+app.get("/", (req, res) => {
+  res.send("🚀 Online Incident Reporting server is running!");
+});
 
 const PORT = process.env.PORT || 4500;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
 });
+
 
 
