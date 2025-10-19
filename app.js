@@ -21,7 +21,7 @@ app.use(filter());
 
 mongoose.Promise = global.Promise;
 
-mongoose.connect(mongoDbUrl, {useMongoClient: true}).then(db =>{
+mongoose.connect(process.env.MONGODB_URI || mongoDbUrl).then(db =>{
     console.log('Mongo connected'); 
 }).catch(error=> console.log(error)); 
 
@@ -100,8 +100,8 @@ app.post('/send', (req, res)=>{
         secure: false, // true for 465, false for other ports
         domains: ["gmail.com", "googlemail.com"],
         auth: {
-            user: 'abdulraoufswehli58@gmail.com', // generated the real user
-            pass: 'RF1631997' // generated ethereal password
+            user: process.env.MAIL_USER, // generated the real user
+            pass: process.env.MAIL_PASS // generated ethereal password
         },
         tls:{
             rejectUnauthorized: false
@@ -110,7 +110,7 @@ app.post('/send', (req, res)=>{
 
     // setup email data with unicode symbols
     let mailOptions = {
-        from: '"Online-Report-Website-Conatct" <abdulraoufswehli58@gmail.com', // sender address
+        from: '"Online-Report-Website-Contact" <nelsonalunogpsi@gmail.com', // sender address
          // list of receivers
         to: 'abdulraoufswehli58@gmail.com, tp042816@mail.apu.edu.my',
         subject: 'Conatct request', // Subject line
@@ -134,7 +134,6 @@ app.post('/send', (req, res)=>{
 
 
 
-app.listen(4500, ()=>{
-    console.log('listening on port 4500')
-});
+const PORT = process.env.PORT || 4500;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
