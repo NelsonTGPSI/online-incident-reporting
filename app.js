@@ -1,4 +1,4 @@
-const https = require('https')
+const https = require('https');
 const express = require('express'); 
 const app = express(); 
 const fs = require('fs');
@@ -8,44 +8,34 @@ const exphabs = require("express-handlebars");
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override'); 
-const upload = require('express-fileupload')
+const upload = require('express-fileupload');
 const session = require("express-session"); 
 const flash = require("connect-flash"); 
-const {mongoDbUrl} = require('./config/database'); 
+const { mongoDbUrl } = require('./config/database'); 
 const passport = require('passport');
-const nodemailer = require('nodemailer')
-var filter = require('content-filter')
+const nodemailer = require('nodemailer');
+var filter = require('content-filter');
 
 app.use(filter());
 
-// ==========================
-// MongoDB Atlas connection
-// ==========================
-mongoose.Promise = global.Promise;
-
+// Conexão MongoDB Atlas
 const mongoURI = process.env.MONGODB_URI || mongoDbUrl;
 
-mongoose.connect(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log('✅ MongoDB connected!'))
-.catch(err => console.log('❌ MongoDB connection error:', err));
+mongoose.connect(mongoURI)
+  .then(() => console.log('✅ MongoDB connected!'))
+  .catch(err => console.log('❌ MongoDB connection error:', err));
 
-
-// ==========================
-// Middleware
-// ==========================
 app.use(express.static(path.join(__dirname, "public"))); 
 
-const {select, generateDate} = require('./helpers/handlebars-helper'); 
+const { select, generateDate } = require('./helpers/handlebars-helper'); 
 
 app.engine('handlebars',
-exphabs({defaultLayout: 'home', helpers: {select: select, generateDate: generateDate}}));
+  exphabs({ defaultLayout: 'home', helpers: { select: select, generateDate: generateDate } })
+);
 app.set('view engine', 'handlebars');
 
 app.use(upload()); 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method')); 
 
 const home = require('./routes/home/index'); 
@@ -64,7 +54,7 @@ app.use(passport.initialize());
 app.use(passport.session()); 
 
 app.use((req, res, next) => {
-    res.locals.user = req.user || null ;
+    res.locals.user = req.user || null;
     res.locals.success_message = req.flash('success_message'); 
     res.locals.error_message = req.flash('error_message'); 
     res.locals.form_errors = req.flash('form_errors'); 
@@ -72,17 +62,11 @@ app.use((req, res, next) => {
     next(); 
 });
 
-// ==========================
-// Routes
-// ==========================
 app.use('/', home); 
 app.use('/admin', admin); 
 app.use('/admin/posts', posts); 
 app.use('/admin/categories', categories); 
 
-// ==========================
-// Contact form route
-// ==========================
 app.post('/send', (req, res) => {
     const output = `
     <p>You have a new contact request</p>
@@ -118,26 +102,19 @@ app.post('/send', (req, res) => {
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return console.log(error);
-        }
+        if (error) return console.log(error);
         console.log('Message sent: %s', info.messageId);
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-        res.render('home/index')
+        res.render('home/index');
     });
 });
 
-// ==========================
-// Test route for Render
-// ==========================
+// Rota básica para Render
 app.get("/", (req, res) => {
-    res.send("🚀 Online Incident Reporting server is running!");
+  res.send("🚀 Online Incident Reporting server is running!");
 });
 
-// ==========================
-// Start server
-// ==========================
 const PORT = process.env.PORT || 4500;
 app.listen(PORT, "0.0.0.0", () => {
-    console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
+  console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
 });
